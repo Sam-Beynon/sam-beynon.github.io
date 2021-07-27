@@ -46,7 +46,7 @@ Now that I have VS Code installed, I can open it by using the following command 
 code
 ```
 
-![Opening VS code via the terminal.]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/opening-VS-code.png)
+![Opening VS code via the terminal.]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/opening_VS_code.png)
 
 After installing VS Code there are some extensions that I require to be able to run and debug my .NET core applications, the main extension required is the C# extension, I install this by pressing F1 to open the Command Pallett and typing the following value
 
