@@ -109,7 +109,7 @@ Once inside, I run the dotnet command to setup a brand new umbraco instance.
 dotnet new umbraco -n MyCustomUmbracoProject
 ```
 
-![Creating Umbraco project using dotnet command]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/creating-umbraco-project.png)
+![Creating Umbraco project using dotnet command]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/creating-umbraco-project.PNG)
 
 Once it has been restored, I can then open the directory that it has created for me in VS code.
 
@@ -119,17 +119,17 @@ code MyCustomUmbracoProject
 
 VSCode will automatically begin to install the dependencies needed if it has not done so before, and then you will need to install the assets specific to the project, required for debugging and running builds via VS Code, this is displayed within a little box, just press the "Yes" button and we can continue.
 
-![Installing C# debug assets in vs code.]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/install-vs-assets.png)
+![Installing C# debug assets in vs code.]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/install-vs-assets.PNG)
 
 After this you need to configure your build task, you can do this by pressing F1 to open the command pallett and typing "build", you should see a record for "Tasks: Configure Default Build Task", click on that and then select "build", it will then add something to the .vscode/tasks.json file which configures VS Code to use dotnet build.
 
 You can then run your application by pressing F5, which will open a debugging process and attach VSCode too it, before opening a new browser window running your new local instance. You should then see the familiar, umbraco install screen.
 
-![The Umbraco install screen.]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/umbraco-install-screen.png)
+![The Umbraco install screen.]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/umbraco-install-screen.PNG)
 
 Set your Name, Email and Password up, and then click "Next", now you should see the database configuration screen in which you should enter "localhost" as the Server, "umbraco" as the database name (or whatever database name you decided on), "sa" as the user and whatever password you chose during the configuration step.
 Once you click "next", umbraco will install and redirect you into your new umbraco back office, running on Ubuntu!
 
-![The Umbraco back office.]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/umbraco-back-office.png)
+![The Umbraco back office.]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/umbraco-back-office.PNG)
 
 That is as far as we go together for now, happy experimenting folks!
