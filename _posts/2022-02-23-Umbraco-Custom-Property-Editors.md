@@ -16,8 +16,8 @@ This post is intended to be a journey of everything i have learned recently whil
 * Validating basic properties.
 * Validating complex objects.
 * Accessing other properties on the same document type.
-* Converting complex objects into consumable front-end models using PropertyConverters. (For your MVC views.)
-* Adding 3rd party angularJS code to the dependencies.
+* Converting complex objects into consumable front-end models using PropertyConverters. (For your razor views.)
+* Adding 3rd party angularJS code to the module.
 * Locating and understanding where the data lives in the Umbraco database.
 * Examples : Creating a picker that is powered by an Umbraco DropDown data type.
 
@@ -29,7 +29,7 @@ To register a new "plugin" you should first create a dedicated folder within the
 
 So, create your folder, in my case i have named it "ExampleCustomPropertyEditor". It is important to take into consideration that a plugin can contain multiple custom property editors.
 
-## --Image goes here--------------
+![The Umbraco install screen.]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/umbraco-install-screen.png)
 
 Once you have created the new home folder for your plugin you need to add a manifest file, which is what Umbraco initially reads and processes to register your plugin related files in the application.
 
@@ -65,4 +65,20 @@ Within your `package.manifest` you will need to define your property editor and 
         "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.controller.js"
     ]
 }
+```
+After which you will obviously need to ensure that the files you have defined within the `package.manifest` exist. So that your folder structure would now look something more like this.
+
+![The Umbraco install screen.]({{ site.baseurl }}/images/Umbraco-9-net-core-linux/umbraco-install-screen.png)
+
+The result of creating these files and the package manifest is rather self explanatory, but to ensure there's no ambiguity, i'll give a brief explanation here, within the `package.manifest` you need to define the javascript files relevant to your plugin, you can include as many as you would like, same with the CSS files, within the `properyEditors` array you declare what the name and aliases of your property editor should be as well as a few other extra configuration options and the location of the angularJS view.
+
+Once put together, this enables Umbraco to inject all this information into the back office AngularJS app, allowing it to render and use the relevant styles, html and javascript included within your custom files.
+
+Your next step is to create content you require for your custom property editor, for this example i'll just create a very basic input that writes to the model and expand upon it as we progress through the post to cover some of the more in-depth topics.
+
+In my html view, i'll create a very "umbraco" like structure, while you can create this with their built in directives, sometimes it's easier to just style some div's with their classes so that you don't have to work around some of the specific weirdness within their directives, especially when attempting to use a `umbProperty` directive, of which there is very little actual documentation. 
+
+For my view I added the following content to my `exampleCustomPropertyEditor.html` file.
+```
+
 ```
