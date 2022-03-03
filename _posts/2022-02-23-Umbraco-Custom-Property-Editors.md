@@ -250,13 +250,37 @@ Now, once we've created that, we'll see a text area or input dependant on what t
 
 
 ## Using data from an Umbraco registered API in your property editor
+
+//create an api
+//create a JS resource.
+//load it in as part of package.manifest.
+//dependency inject it into controller.
+//access the values and display them.
+
 ## Using data from the Umbraco system in your property editor from angular resources
+//access an umbraco resource from dependency injection
+//load and display the data.
+//show examples of contentResource, contentTypeResource (document types), dataTypeResource 
+
 ## Using infinite editor style modals.
+//Open modals, pass data down from modal to calling prop etc.
+
 ## Validating basic properties.
+//val-property-validator
 ## Validating complex objects.
-## Accessing other properties on the same document type.
-## Converting complex objects into consumable front-end razor models using PropertyConverters. 
-## Adding 3rd party angularJS code to the module.
+//val-property-validator with an object instead of a string/bool val.
+
 ## Automatically populating related custom and system defined properties on the server side
+//notifications
 ## Automatically populating related custom and system defined properties on the client side
+//traverse scope chain and see if this is possible.
+
+## Converting complex objects into consumable front-end razor models using PropertyConverters. 
+
+//How to use property converters.
+
+## Adding 3rd party angularJS code to the module.
+//Simple, module definition, need to find a package to include. https://angular-ui.github.io/
+
 ## Locating and understanding where the data lives in the Umbraco database.
+//some fun DB stuff
