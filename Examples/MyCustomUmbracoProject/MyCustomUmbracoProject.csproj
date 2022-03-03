@@ -19,6 +19,7 @@
         <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2" />
     </ItemGroup>
     <ItemGroup>
+      <None Include="App_Plugins\ExampleCustomPropertyEditor\customApi.resource.js" />
       <None Include="App_Plugins\ExampleCustomPropertyEditor\exampleCustomPropertyEditor.controller.js" />
       <None Include="App_Plugins\ExampleCustomPropertyEditor\package.manifest" />
     </ItemGroup>

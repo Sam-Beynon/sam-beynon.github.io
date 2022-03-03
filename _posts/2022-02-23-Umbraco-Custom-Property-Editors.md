@@ -251,10 +251,136 @@ Now, once we've created that, we'll see a text area or input dependant on what t
 
 ## Using data from an Umbraco registered API in your property editor
 
-//create an api
-//create a JS resource.
+Alot of custom properties are likely to require custom data, data that you may store within the Umbraco database, or as part of another property. There are different ways to get at this information in the system, one of which is to provide an API for your angular controller to call, you do this "properly" by defining a re-usable resource.
+
+While you can put these calls directly into your controller, it typically makes sense to wrap them in a factory so that they can be used anywhere you might need them without duplicating code.
+
+So your first step in this case is to create an `UmbracoAuthorizedApiController`, these controllers are accessible only to back office authorised users and as such, external sources are unable to access them.
+
+To create your consumable API, you need to create a class that inherits from `UmbracoAuthorizedApiController` which returns whatever data you want it too, this post isn't about business logic, or accessing databases, so i'll just return a hardcoded list of objects that my controller can consume.
+
+```C#
+using System.Collections.Generic;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Attributes;
+
+namespace MyCustomUmbracoProject.Controllers
+{
+
+    //define your plugin controller here, this affects the route for the API endpoints.
+    [PluginController("MyCustomPlugin")]
+    //make sure you inherit from UmbracoAuthorisedApiController
+    public class MyCustomApiController: UmbracoAuthorizedApiController
+    {
+        //Create a basic GetAll method
+        public IEnumerable<string> GetAll()
+        {
+            //hard coded data.
+            List<string> vs = new List<string>()
+            {
+                "string 1",
+                "string 2",
+                "string 3",
+                "string 4",
+                "string 5",
+                "string 6",
+                "string 7",
+                "string 8",
+            };
+            //return that data to the consumer.
+            return vs;
+        }
+    }
+}
+```
+
+Now that you have an API that your angularJS controller can consume you need to create an angularJS resource. To do this, you need to create another js file, in my case i have created the file `~/App_Plugins/ExampleCustomPropertyEditor/customApi.resource.js` with the following contents 
+
+```js
+// adds the resource to umbraco.resources module:
+angular.module('umbraco.resources').factory('customApiResource',
+    //pull in your dependencies,
+    //$http is an AngularJS provided resource that handles http calls
+    //umRequestHelper is an Umbraco provided resource that helps wrap promises and some other useful things.
+    function ($http, umbRequestHelper) {
+        // the factory object returned
+        return {
+            // this calls the ApiController we setup earlier
+            getAll: function () {
+                return umbRequestHelper.resourcePromise(
+                    //take note of the route
+                    //backoffice is required for all authorized controllers
+                    //MyCustomPlugin is defined in the [PluginController] attribute on the api controller.
+                    //MyCustomApi is the name of the class without the trailing "Controller"
+                    //GetAll is the name of the method we are calling.
+                    $http.get("backoffice/MyCustomPlugin/MyCustomApi/GetAll"),
+                    //Second parameter is the error message that should occur if the call fails.
+                    "Failed to retrieve data");
+            }
+        };
+    }
+);
+```
+
+I've put all the pertinent information into the comments on the resource code itself so that it's better contextualized.
+
 //load it in as part of package.manifest.
+
+After creating the resource you need to inject it into the back office inside your `package.manifest`, which is achieved by simply adding a second js file to the `javascript` block, like so.
+
+```json
+{
+    // we can define multiple editors
+    "propertyEditors": [
+      {
+        /*this must be a unique alias*/
+        "alias": "customPropertyEditor",
+        /*the name*/
+        "name": "Custom Editor",
+        /*the icon- You can find a list of them here, although the list is for V7, it mostly still works for V9 https://nicbell.github.io/ucreate/icons.html */
+        "icon": "icon-list",
+        /*grouping for "Select editor" dialog*/
+        "group": "Common",
+        /*the HTML file we will load for the editor*/
+        "editor": {
+          "view": "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.html"
+        }, //Remember your comma here
+        //Configuration fields start here.
+        "prevalues": {
+          "fields": [
+            {
+              "label": "Show as Text Area?",
+              "description": "If you tick this, the property will display as a text area instead of a single line text box.",
+              "key": "showAsTextArea",
+              "view": "boolean"
+            }
+          ]
+        }
+        //Configuration fields end here.
+      }
+    ],
+     // array of CSS files we want to inject into the application on app_start
+    "css": [
+        "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.css"
+    ],
+    // array of JS files we want to inject into the application on app_start
+    "javascript": [
+        "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.controller.js",
+        "~/App_Plugins/ExampleCustomPropertyEditor/customApi.resource.js"
+    ]
+}
+```
+
 //dependency inject it into controller.
+
+Once it is defined within the `package.manifest` you can inject it into your controller and utilise the `GetAll()` method to call the api and return the data, to do this, i modified my controller to the following.
+
+```javascript
+
+```
+
+//This bit's in progress.
+
 //access the values and display them.
 
 ## Using data from the Umbraco system in your property editor from angular resources
