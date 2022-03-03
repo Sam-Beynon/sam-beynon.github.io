@@ -1,0 +1,39 @@
+﻿{
+    // we can define multiple editors
+    "propertyEditors": [
+      {
+        /*this must be a unique alias*/
+        "alias": "customPropertyEditor",
+        /*the name*/
+        "name": "Custom Editor",
+        /*the icon- You can find a list of them here, although the list is for V7, it mostly still works for V9 https://nicbell.github.io/ucreate/icons.html */
+        "icon": "icon-list",
+        /*grouping for "Select editor" dialog*/
+        "group": "Common",
+        /*the HTML file we will load for the editor*/
+        "editor": {
+          "view": "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.html"
+        }, //Remember your comma here
+        //Configuration fields start here.
+        "prevalues": {
+          "fields": [
+            {
+              "label": "Show as Text Area?",
+              "description": "If you tick this, the property will display as a text area instead of a single line text box.",
+              "key": "showAsTextArea",
+              "view": "boolean"
+            }
+          ]
+        }
+        //Configuration fields end here.
+      }
+    ],
+     // array of CSS files we want to inject into the application on app_start
+    "css": [
+        "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.css"
+    ],
+    // array of JS files we want to inject into the application on app_start
+    "javascript": [
+        "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.controller.js"
+    ]
+}

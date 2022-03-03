@@ -1,0 +1,7 @@
+﻿<div ng-controller="exampleCustomPropertyEditorController">
+    <!--Add an ng-if to the input, to render it if showAsTextArea is false.-->
+    <input type="text" placeholder="Enter some text" ng-model="model.value" ng-if="!showAsTextArea" />
+    <!-- add a text area with the opposite ng-if so we can render it if showTextArea is true-->
+    <!-- 4 rows, for fun-->
+    <textarea placeholder="Enter some text" ng-model="model.value" ng-if="showAsTextArea" rows="4" />
+</div>
