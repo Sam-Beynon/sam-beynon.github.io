@@ -545,7 +545,7 @@ angular.module('umbraco').controller('exampleCustomPropertyEditorController',
 ```
 
 This example is solely there to show you how to access these resources, and how to find the information you might require.
-Unforunately the `ContentResource` has very specific use cases and typically requires you to know the id of something you want to access, but alot of the other resources typically have a `GetAll` method that you will be able to use, allowing people to select specific items so you are able to capture the value and run operations on it using different available methods.
+Unforunately the `ContentResource` has very specific use cases and typically requires you to know the id of something you want to access, but alot of the other resources typically have a `GetAll` method that you will be able to use, allowing people to select specific items so you are able to capture the value and run operations on it using different available methods, I may go into more detail on using specific resources in future posts, but for the scope of this post, a general understanding of how to access them is the goal.
 
 ## Using infinite editor style modals.
 //Open modals, pass data down from modal to calling prop etc.
