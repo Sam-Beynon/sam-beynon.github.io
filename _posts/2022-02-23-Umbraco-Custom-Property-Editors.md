@@ -238,7 +238,7 @@ angular.module('umbraco').controller('exampleCustomPropertyEditorController', fu
     <input type="text" placeholder="Enter some text" ng-model="model.value" ng-if="!showAsTextArea" />
     <!-- add a text area with the opposite ng-if so we can render it if showTextArea is true-->
     <!-- 4 rows, for fun-->
-    <textarea placeholder="Enter some text" ng-model="model.value" ng-if="showAsTextArea" rows="4" />
+    <textarea placeholder="Enter some text" ng-model="model.value" ng-if="showAsTextArea" rows="4"></textarea>
 </div>
 ```
 
@@ -301,7 +301,7 @@ Now that you have an API that your angularJS controller can consume you need to 
 angular.module('umbraco.resources').factory('customApiResource',
     //pull in your dependencies,
     //$http is an AngularJS provided resource that handles http calls
-    //umRequestHelper is an Umbraco provided resource that helps wrap promises and some other useful things.
+    //umbRequestHelper is an Umbraco provided resource that helps wrap promises and some other useful things.
     function ($http, umbRequestHelper) {
         // the factory object returned
         return {
@@ -323,8 +323,6 @@ angular.module('umbraco.resources').factory('customApiResource',
 ```
 
 I've put all the pertinent information into the comments on the resource code itself so that it's better contextualized.
-
-//load it in as part of package.manifest.
 
 After creating the resource you need to inject it into the back office inside your `package.manifest`, which is achieved by simply adding a second js file to the `javascript` block, like so.
 
@@ -371,17 +369,59 @@ After creating the resource you need to inject it into the back office inside yo
 }
 ```
 
-//dependency inject it into controller.
-
 Once it is defined within the `package.manifest` you can inject it into your controller and utilise the `GetAll()` method to call the api and return the data, to do this, i modified my controller to the following.
 
 ```javascript
+//First off, you add the customApiResource to the function parameter, to utilise the dependency injection.
+angular.module('umbraco').controller('exampleCustomPropertyEditorController', function ($scope, customApiResource) {
 
+    let config = $scope.model.config;
+
+    if (typeof (config.showAsTextArea) === 'undefined' || config.showAsTextArea === null)
+        config.showAsTextArea = false;
+
+    config.showAsTextArea = config.showAsTextArea === "0" ? false : true;
+
+    $scope.showAsTextArea = config.showAsTextArea;
+
+    //Define your empty variable
+    $scope.listOfRandomThings = [];
+
+    //then you can call the api method like so.
+    customApiResource.getAll().then(function (returnValue) {
+        //returnValue is now the data passed back by the API which you can view by logging it to the console.
+        console.log(returnValue);
+        //it looks like...
+        //Array(8)["string 1", "string 2", "string 3", "string 4", "string 5", "string 6", "string 7", "string 8"]
+
+        //You could then render that by binding it to a scoped variable.
+        $scope.listOfRandomThings = returnValue;
+        //and adding an ng-repeat to the html.
+    })
+
+
+});
+```
+Once you've retrieved the data from the server and have bound it to a $scoped variable, you can access it from the html and display the data using html similar to the following.
+
+```html
+<div ng-controller="exampleCustomPropertyEditorController">
+    <!--Add an ng-if to the input, to render it if showAsTextArea is false.-->
+    <input type="text" placeholder="Enter some text" ng-model="model.value" ng-if="!showAsTextArea" />
+    <!-- add a text area with the opposite ng-if so we can render it if showTextArea is true-->
+    <!-- 4 rows, for fun-->
+    <textarea placeholder="Enter some text" ng-model="model.value" ng-if="showAsTextArea" rows="4"></textarea>
+  
+    <!--this line is rendering data from the server side.-->
+    <ul>
+        <li ng-repeat="something in listOfRandomThings track by $index">{{something}}</li>
+    </ul>
+</div>
 ```
 
-//This bit's in progress.
+It's as simple as that! There are a few components around that you need to remember, but it does mean that everything is becoming re-usable throughout your properties and other relevant angular code, such as building custom dashboards. For reference, if you're following along with me, you'll see something as beautifully dull as the image below at this point.
 
-//access the values and display them.
+![Data loaded from the server]({{ site.baseurl }}/images\Umbraco-Custom-Property-Editors\display-data-from-server.png)
 
 ## Using data from the Umbraco system in your property editor from angular resources
 //access an umbraco resource from dependency injection
@@ -393,6 +433,8 @@ Once it is defined within the `package.manifest` you can inject it into your con
 
 ## Validating basic properties.
 //val-property-validator
+//strings, ints, bools, etc.
+
 ## Validating complex objects.
 //val-property-validator with an object instead of a string/bool val.
 
