@@ -425,8 +425,127 @@ It's as simple as that! There are a few components around that you need to remem
 
 ## Using data from the Umbraco system in your property editor from angular resources
 //access an umbraco resource from dependency injection
-//load and display the data.
-//show examples of contentResource, contentTypeResource (document types), dataTypeResource 
+
+Umbraco provides a decent number of resources out of the box that allow us to access things like content, document types and data types without implementing custom API's to access the C# services, these are quite powerful as they allow you to build custom components that allow you to list things in your custom properties that aren't generally available as built-in property editors.
+
+Some examples of things you can create with this are document type selectors, which would allow users to select one (or more) document types and attach it to a document as a property, or accessing data stored within the pre-values of a data type.
+
+I'm going to provide an example of accessing a few resource, but the full list is available on their official documentation - https://apidocs.umbraco.com/v9/ui/#/api/umbraco.resources
+
+The first thing you have to do is inject the relevant resource into your controller and then you can access it and call any of the underlying methods, of course you can see these methods in your browser with a simple `console.log()` if you prefer to avoid the documentation, in the following manner.
+
+```javascript
+//firstly, add the contentResource as an injected parameter.
+angular.module('umbraco').controller('exampleCustomPropertyEditorController',
+    function ($scope, customApiResource, contentResource) {
+
+        //then you can console.log() it to find the underlying methods available to you.
+        console.log(contentResource);
+        //this returns the following - 
+        //allowsCultureVariation: function allowsCultureVariation()
+        //contentVersionPreventCleanup: function contentVersionPreventCleanup(contentId, versionId, preventCleanup)
+        //copy: function copy(args)
+        //createBlueprintFromContent: function createBlueprintFromContent(contentId, name)
+        //deleteBlueprint: function deleteBlueprint(id)
+        //deleteById: function deleteById(id)
+        //emptyRecycleBin: function emptyRecycleBin()
+        //getBlueprintById: function getBlueprintById(id)
+        //getBlueprintScaffold: function getBlueprintScaffold(parentId, blueprintId)
+        //getById: function getById(id)
+        //getByIds: function getByIds(ids)
+        //getChildren: function getChildren(parentId, options)
+        //getCultureAndDomains: function getCultureAndDomains(id)
+        //getDetailedPermissions: function getDetailedPermissions(contentId)
+        //getNiceUrl: function getNiceUrl(id)
+        //getNotifySettingsById: function getNotifySettingsById(id)
+        //getPagedContentVersions: function getPagedContentVersions(contentId, pageNumber, pageSize, culture)
+        //getPublicAccess: function getPublicAccess(contentId)
+        //getRecycleBin: function getRecycleBin()
+        //getRollbackVersion: function getRollbackVersion(versionId, culture)
+        //getRollbackVersions: function getRollbackVersions(contentId, culture)
+        //getScaffold: function getScaffold(parentId, alias)
+        //getScaffoldByKey: function getScaffoldByKey(parentId, contentTypeKey)
+        //getScaffoldByKeys: function getScaffoldByKeys(parentId, scaffoldKeys)
+        //getScaffolds: function getScaffolds(parentId, aliases)
+        //move: function move(args)
+        //publish: function publish(content, isNew, files, showNotifications)
+        //publishById: function publishById(id)
+        //publishWithDescendants: function publishWithDescendants(content, isNew, force, files, showNotifications)
+        //removePublicAccess: function removePublicAccess(contentId)
+        //rollback: function rollback(contentId, versionId, culture)
+        //save: function save(content, isNew, files, showNotifications)
+        //saveBlueprint: function saveBlueprint(content, isNew, files, showNotifications)
+        //saveLanguageAndDomains: function saveLanguageAndDomains(model)
+        //savePermissions: function savePermissions(saveModel)
+        //saveSchedule: function saveSchedule(content, isNew, files, showNotifications)
+        //sendToPublish: function sendToPublish(content, isNew, files, showNotifications)
+        //setNotifySettingsById: function setNotifySettingsById(id, options)
+        //sort: function sort(args)
+        //unpublish: function unpublish(id, cultures)
+        //updatePublicAccess: function updatePublicAccess(contentId, groups, usernames, loginPageId, errorPageId)
+
+        //Knowing what your own root node id is you can then access it like so.
+        contentResource.getById(1057).then(function (response) {
+            //log your response
+            console.log(response);
+            //this looks something like this for me.
+            //allowPreview: true
+            //allowedActions: Array(19)["C", "A", "D", … ]
+            //allowedTemplates: Object { }
+            //apps: Array[{ … }, { … }]
+            //contentTypeAlias: "testDocumentType"
+            //contentTypeId: 1056
+            //contentTypeKey: "74f69d59-749f-4785-9bf2-cddd59447af8"
+            //contentTypeName: "Test Document Type"
+            //documentType: Object { alias: "testDocumentType", updateDate: "2022-03-03 12:37:46", createDate: "2022-03-03 12:37:46", … }
+            //icon: "icon-item-arrangement"
+            //id: 1057
+            //isBlueprint: false
+            //isChildOfListView: false
+            //isContainer: false
+            //isElement: false
+            //key: "7e6e67ff-228a-4b5b-806c-e7d6d6ec2f6f"
+            //metaData: null
+            //notifications: Array[]
+            //owner: Object { id: -1, name: "Sam" }
+            //parentId: -1
+            //path: "-1,1057"
+            //sortOrder: 0
+            //template: null
+            //templateId: 0
+            //trashed: false
+            //treeNodeUrl: "/umbraco/backoffice/umbracotrees/contenttree/GetTreeNode/7e6e67ff228a4b5b806ce7d6d6ec2f6f"
+            //udi: "umb://document/7e6e67ff228a4b5b806ce7d6d6ec2f6f"
+            //updateDate: "2022-03-03 12:52:17"
+            //updater: Object { id: -1, name: "Sam" }
+            //urls: Array[{ … }]
+            //variants: Array[{ … }]
+
+
+            //You can then bind any data you want  to a scoped variable and display it in the front end using angularjs binding.
+        })
+
+
+        let config = $scope.model.config;
+
+        if (typeof (config.showAsTextArea) === 'undefined' || config.showAsTextArea === null)
+            config.showAsTextArea = false;
+
+        config.showAsTextArea = config.showAsTextArea === "0" ? false : true;
+
+        $scope.showAsTextArea = config.showAsTextArea;
+
+        $scope.listOfRandomThings = [];
+        customApiResource.getAll().then(function (returnValue) {
+            $scope.listOfRandomThings = returnValue;
+        })
+
+
+    });
+```
+
+This example is solely there to show you how to access these resources, and how to find the information you might require.
+Unforunately the `ContentResource` has very specific use cases and typically requires you to know the id of something you want to access, but alot of the other resources typically have a `GetAll` method that you will be able to use, allowing people to select specific items so you are able to capture the value and run operations on it using different available methods.
 
 ## Using infinite editor style modals.
 //Open modals, pass data down from modal to calling prop etc.
