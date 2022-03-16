@@ -29,12 +29,14 @@
       }
     ],
      // array of CSS files we want to inject into the application on app_start
-    "css": [
-        "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.css"
-    ],
+  "css": [
+    "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.css",
+    "~/App_Plugins/ExampleCustomPropertyEditor/exampleInfiniteEditor.css"
+  ],
     // array of JS files we want to inject into the application on app_start
   "javascript": [
     "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.controller.js",
+    "~/App_Plugins/ExampleCustomPropertyEditor/exampleInfiniteEditor.controller.js",
     "~/App_Plugins/ExampleCustomPropertyEditor/customApi.resource.js"
   ]
 }

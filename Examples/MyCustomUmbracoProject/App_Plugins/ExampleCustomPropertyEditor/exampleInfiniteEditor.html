@@ -1,0 +1,42 @@
+﻿<div ng-controller="exampleInfiniteEditorController">  
+    <umb-panel>
+        <umb-editor-view>
+            <umb-editor-container>
+                <ng-form>
+                    <div ng-repeat="something in listOfRandomThings track by $index">
+                        <span>
+                            <input type="radio" id="{{something}}" value="{{something}}" name="selectedRandomThing" ng-model="selectedRandomThing" />
+                        </span>
+                        <span>
+                            {{something}}
+                        </span>
+
+                    </div>
+                </ng-form>
+            </umb-editor-container>
+        </umb-editor-view>
+
+        <umb-editor-footer >
+            <umb-editor-footer-content-right>
+                <umb-button action="model.close()"
+                            type="button"
+                            button-style="action"
+                            state="vm.saveButton.state"
+                            label="Close"
+                            disabled="vm.buttonState === 'busy'">
+                </umb-button>
+                <umb-button action="model.save()"
+                            type="button"
+                            button-style="action"
+                            state="vm.saveButton.state"
+                            shortcut="ctrl+s"
+                            label="Save"
+                            disabled="vm.buttonState === 'busy'">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-panel>
+    
+    
+</div>

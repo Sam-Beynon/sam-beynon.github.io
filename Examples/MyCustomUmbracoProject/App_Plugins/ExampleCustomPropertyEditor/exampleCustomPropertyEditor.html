@@ -3,7 +3,9 @@
     <input type="text" placeholder="Enter some text" ng-model="model.value" ng-if="!showAsTextArea" />
     <!-- add a text area with the opposite ng-if so we can render it if showTextArea is true-->
     <!-- 4 rows, for fun-->
-    <textarea placeholder="Enter some text" ng-model="model.value" ng-if="showAsTextArea" rows="4" />
-    <!--below line is rendering data from the server side.-->
-    <p ng-repeat="something in listOfRandomThings">{{something}}</p>
+    <textarea placeholder="Enter some text" ng-model="model.value" ng-if="showAsTextArea" rows="4"></textarea>
+    <div>
+        <button type="button" ng-click="openInfiniteEditor()">Select a random string</button>
+    </div>
+    
 </div>

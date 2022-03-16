@@ -5,6 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Content Include="App_Plugins\ExampleCustomPropertyEditor\exampleInfiniteEditor.css" />
+      <Content Include="App_Plugins\ExampleCustomPropertyEditor\exampleInfiniteEditor.html" />
       <Content Include="App_Plugins\ExampleCustomPropertyEditor\exampleCustomPropertyEditor.css" />
       <Content Include="App_Plugins\ExampleCustomPropertyEditor\exampleCustomPropertyEditor.html" />
     </ItemGroup>
@@ -20,6 +22,7 @@
     </ItemGroup>
     <ItemGroup>
       <None Include="App_Plugins\ExampleCustomPropertyEditor\customApi.resource.js" />
+      <None Include="App_Plugins\ExampleCustomPropertyEditor\exampleInfiniteEditor.controller.js" />
       <None Include="App_Plugins\ExampleCustomPropertyEditor\exampleCustomPropertyEditor.controller.js" />
       <None Include="App_Plugins\ExampleCustomPropertyEditor\package.manifest" />
     </ItemGroup>

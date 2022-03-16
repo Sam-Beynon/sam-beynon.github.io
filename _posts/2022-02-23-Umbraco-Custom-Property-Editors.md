@@ -21,7 +21,6 @@ This post is intended to be a journey of everything i have learned recently whil
 * Adding 3rd party angularJS code to the module.
 * Automatically populating related custom and system defined properties on the server side
 * Automatically populating related custom and system defined properties on the client side
-* Locating and understanding where the data lives in the Umbraco database.
 
 
 ## Creating a basic property editor and registering it for use in Umbraco.
@@ -197,6 +196,7 @@ You can add as many seperate configuration options to your property editor as yo
 
 Now, in the above example I have configured a check box to appear which I would eventually like to set the property editor as a text area, instead of a regular text box. I will get to how you consume the configuration values in a moment, but for now you should be able to see something along the lines of a checkbox or a switch with the label "Show as text area" when you are creating a new, or modifying an old `Data Type` as long as the custom property editor is selected.
 
+An additional note here is that you can see all the built-in umbraco "views" for the fields by going to `wwwroot/umbraco/views/prevalueeditors` in your project and removing the ".html" from the end.
 
 ![Adding configuration to custom property editor]({{ site.baseurl }}/images\Umbraco-Custom-Property-Editors\display-configuration-options.png)
 
@@ -424,7 +424,6 @@ It's as simple as that! There are a few components around that you need to remem
 ![Data loaded from the server]({{ site.baseurl }}/images\Umbraco-Custom-Property-Editors\display-data-from-server.png)
 
 ## Using data from the Umbraco system in your property editor from angular resources
-//access an umbraco resource from dependency injection
 
 Umbraco provides a decent number of resources out of the box that allow us to access things like content, document types and data types without implementing custom API's to access the C# services, these are quite powerful as they allow you to build custom components that allow you to list things in your custom properties that aren't generally available as built-in property editors.
 
@@ -548,7 +547,187 @@ This example is solely there to show you how to access these resources, and how 
 Unforunately the `ContentResource` has very specific use cases and typically requires you to know the id of something you want to access, but alot of the other resources typically have a `GetAll` method that you will be able to use, allowing people to select specific items so you are able to capture the value and run operations on it using different available methods, I may go into more detail on using specific resources in future posts, but for the scope of this post, a general understanding of how to access them is the goal.
 
 ## Using infinite editor style modals.
-//Open modals, pass data down from modal to calling prop etc.
+
+Umbraco provides a nice service called the `editorService` which allows us to open media pickers and some other built in pickers, while also providing us with the ability to open custom infinite editors.
+An infinite editor is one of the lovely little panels that slides in from the right of the screen when you are using a media picker, you can add whatever UI and data you want to the infinite editor and utilise it to pass data down to your custom property editor.
+
+In my example here, I'm going to add create an infinite editor that displays the list of strings that I previously created, pulled down from an API, allow a user to select one and then display the selected string in the custom property editor, it's a nice way to seperate large amounts of selectable content especially content like media and content nodes that have a larger information set to portray to the selector than something that can just be stored within a simple dropdown.
+
+So my first step when creating an infinite editor is to create a new html,js and css file to house the view, controller and styles for the content that will be displayed within the infinite editor.
+
+As such I create the following files
+
+![App_Plugins structure after creating infinite editor files]({{ site.baseurl }}/images\Umbraco-Custom-Property-Editors\infinite-editor-create-files.png)
+
+Following by referencing these new files within the `package.manifest`, an interesting point with these editors, is that you do not provide the html view to the `package.manifest` as you directly refer to it in the call to the infinite editor service, so my `package.manifest` ends up looking like so.
+
+```C#
+{
+    // we can define multiple editors
+    "propertyEditors": [
+      {
+        /*this must be a unique alias*/
+        "alias": "customPropertyEditor",
+        /*the name*/
+        "name": "Custom Editor",
+        /*the icon- You can find a list of them here, although the list is for V7, it mostly still works for V9 https://nicbell.github.io/ucreate/icons.html */
+        "icon": "icon-list",
+        /*grouping for "Select editor" dialog*/
+        "group": "Common",
+        /*the HTML file we will load for the editor*/
+        "editor": {
+          "view": "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.html"
+        }, //Remember your comma here
+        //Configuration fields start here.
+        "prevalues": {
+          "fields": [
+            {
+              "label": "Show as Text Area?",
+              "description": "If you tick this, the property will display as a text area instead of a single line text box.",
+              "key": "showAsTextArea",
+              "view": "boolean"
+            }
+          ]
+        }
+        //Configuration fields end here.
+      }
+    ],
+     // array of CSS files we want to inject into the application on app_start
+  "css": [
+    "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.css",
+    "~/App_Plugins/ExampleCustomPropertyEditor/exampleInfiniteEditor.css"
+  ],
+    // array of JS files we want to inject into the application on app_start
+  "javascript": [
+    "~/App_Plugins/ExampleCustomPropertyEditor/exampleCustomPropertyEditor.controller.js",
+    "~/App_Plugins/ExampleCustomPropertyEditor/exampleInfiniteEditor.controller.js",
+    "~/App_Plugins/ExampleCustomPropertyEditor/customApi.resource.js"
+  ]
+}
+```
+
+Once these files have been inserted into the `package.manifest` like this, they will, as per the previous steps be injected into the back office application and allow us to access them, now, while the html view does not need to be declared, the css and JS do, firstly, because the CSS can actually be used anywhere within the application and secondly, the controller within your angularJS code needs to be injected into the module, which is best done at startup.
+
+Now we can focus on building up the content of these files, what I need to do here is fairly simple, I just need to pull the data down and display it with radio boxes, so a user can select a specific row and then pass that row back to the property editor.
+
+First of all, I'll build up a typical controller and view like so.
+
+```JavaScript
+angular.module('umbraco').controller('exampleInfiniteEditorController',
+    function ($scope, customApiResource) {
+
+        $scope.listOfRandomThings = [];
+        customApiResource.getAll().then(function (returnValue) {
+            $scope.listOfRandomThings = returnValue;
+        })
+
+
+    });
+```
+
+This will load down the list of strings that I create within a custom API controller from a previous section of this post, and then the view will display it like so.
+
+```html
+<div ng-controller="exampleInfiniteEditorController">  
+    <umb-panel>
+        <umb-editor-view>
+            <umb-editor-container>
+                <ng-form>
+                    <div ng-repeat="something in listOfRandomThings track by $index">
+                        <span>
+                            <input type="radio" id="{{something}}" value="{{something}}" name="selectedRandomThing" ng-model="selectedRandomThing" />
+                        </span>
+                        <span>
+                            {{something}}
+                        </span>
+
+                    </div>
+                </ng-form>
+            </umb-editor-container>
+        </umb-editor-view>
+
+        <umb-editor-footer >
+            <umb-editor-footer-content-right>
+                <umb-button action="model.close()"
+                            type="button"
+                            button-style="action"
+                            state="vm.saveButton.state"
+                            label="Close"
+                            disabled="vm.buttonState === 'busy'">
+                </umb-button>
+                <umb-button action="model.save()"
+                            type="button"
+                            button-style="action"
+                            state="vm.saveButton.state"
+                            shortcut="ctrl+s"
+                            label="Save"
+                            disabled="vm.buttonState === 'busy'">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-panel>
+    
+    
+</div>
+```
+
+This view will load a simple list of strings with associated checkboxes and then bind the selected value to the `$scope.selectedRandomThing` variable, which will be automatically defined and created for us by angularJS as soon as an item is selected. As well as this, it will create umbraco styled buttons along the bottom of the editor, in keeping with the standard umbraco styles.
+
+Now, the next step to achieving this, is to add the code we require to our custom property editor, to call and open an infinite editor with this content in, we can do this using the `editorService` like so.
+
+```javascript
+angular.module('umbraco').controller('exampleCustomPropertyEditorController',
+//note the editorService, injected.
+    function ($scope, customApiResource, editorService) {
+
+    
+        let config = $scope.model.config;
+
+        if (typeof (config.showAsTextArea) === 'undefined' || config.showAsTextArea === null)
+            config.showAsTextArea = false;
+
+        config.showAsTextArea = config.showAsTextArea === "0" ? false : true;
+
+        $scope.showAsTextArea = config.showAsTextArea;
+
+        $scope.listOfRandomThings = [];
+        customApiResource.getAll().then(function (returnValue) {
+            $scope.listOfRandomThings = returnValue;
+        })
+
+
+        //use the editorService to open your editor.
+        $scope.openInfiniteEditor = function () {
+            editorService.open($scope.infiniteEditorOptions);
+        }
+
+        //set up some configuration options for the infinite editor.
+        $scope.infiniteEditorOptions = {
+            title: "Infinite Editor Title",
+            view: "/App_Plugins/ExampleCustomPropertyEditor/exampleInfiniteEditor.html",
+            size: 'small', //small, medium or large
+            submit: function (model) {
+
+            },
+            close: function () {
+                editorService.close();
+            }
+        };
+
+
+
+    });
+
+```
+
+And we'll need to add a button, or some form of trigger to the property editor to allow us to call the infinite editor.
+
+```html
+
+
+```
+
 
 ## Validating basic properties.
 //val-property-validator
@@ -562,12 +741,12 @@ Unforunately the `ContentResource` has very specific use cases and typically req
 ## Automatically populating related custom and system defined properties on the client side
 //traverse scope chain and see if this is possible.
 
-## Converting complex objects into consumable front-end razor models using PropertyConverters. 
+## Converting objects into consumable front-end razor models using PropertyConverters. 
 
 //How to use property converters.
 
 ## Adding 3rd party angularJS code to the module.
 //Simple, module definition, need to find a package to include. https://angular-ui.github.io/
 
-## Locating and understanding where the data lives in the Umbraco database.
-//some fun DB stuff
+
+And there you have it, my attempt at sharing the knowledge I have gained regarding custom property editors in Umbraco 9, and while some of these features/techniques will work nicely with custom dashboards as well, they are a bit of a different ballgame, so I'll cover some bits on them in the future, but for now, stay safe and have a wonderful day.
